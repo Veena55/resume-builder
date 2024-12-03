@@ -19,7 +19,7 @@ jobs:
          # Step 3: Install dependencies for backend and frontend
         - name: Install backend dependencies
           run: |
-            cd server
+            cd backend
             npm install
   
         - name: Install frontend dependencies
