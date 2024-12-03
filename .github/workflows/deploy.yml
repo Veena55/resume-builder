@@ -1,0 +1,50 @@
+name : Deploy MERN Stack Project
+on:
+  push:
+    branches:
+        - master  # Trigger the workflow on push to the 'master' branch
+jobs:
+  build:
+        runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
+  steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+            # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Specify the Node.js version
+
+       # Step 3: Install dependencies for backend and frontend
+      - name: Install backend dependencies
+        run: |
+          cd server
+          npm install
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+          
+        # Step 4: Build the frontend
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+            # Step 5: Deploy to Server (SSH into the server)
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
+          username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
+          key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
+          port: 22  # SSH port (usually 22)
+          script: |
+            cd /var/www/resume-builder
+            git pull origin master
+            cd frontend && npm install && npm run build
+            pm2 restart resume-builder-backend  # Restart backend process
+            sudo systemctl restart apache2  # Restart Apache server to serve updated frontend
+        
