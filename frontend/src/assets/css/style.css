@@ -1,0 +1,251 @@
+:root {
+    --theme-color: #bafe66;
+    --theme-dark-color: #72bf14;
+    --light-theme-color: #d3f8a8;
+    --gradient-theme-color: linear-gradient(to right, #546a38, #111);
+    --light-shadow: 2px 2px 15px 5px #787877a0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.light-shadow {
+    box-shadow: var(--light-shadow);
+}
+
+.bg-gradient {
+    background: #111;
+}
+
+.bg-theme {
+    background-color: var(--theme-color);
+}
+
+.bg-light-theme {
+    background-color: var(--light-theme-color);
+}
+
+.text-dark-theme {
+    color: var(--theme-dark-color);
+}
+
+
+.nav_link {
+    font-size: 1.2vw;
+    border-bottom: 2px solid transparent;
+    transition: all 1s;
+}
+
+.nav_link:hover {
+    border-bottom: 2px solid var(--light-theme-color);
+}
+
+.text-theme-color {
+    color: var(--theme-color)
+}
+
+.authentication-input {
+    border: none;
+    border-bottom: 0;
+    border-radius: 0;
+    padding-bottom: 12px;
+}
+
+.authentication-input:focus {
+    outline: none !important;
+    border: none;
+    box-shadow: none;
+}
+
+.cta-btn {
+    background: var(--theme-color);
+}
+
+.cta-btn-2 {
+    border: 2px solid var(--theme-color);
+    background-color: #fff;
+}
+
+.cta-btn-2:hover {
+    background-color: var(--theme-color);
+}
+
+.cta-btn-3 {
+    border: 2px solid var(--theme-color);
+    background-color: #111;
+    color: #FFF;
+}
+
+.cta-btn-3:hover {
+    background-color: var(--theme-color);
+    border: 2px solid #111;
+}
+
+.cta-btn-3:focus .auth-curve {
+    background-color: red !important;
+}
+
+.input-cover {
+    border-bottom: 1px solid var(--theme-color);
+}
+
+.input-cover:hover {
+    border-bottom: 2px solid var(--theme-color);
+}
+
+.add_details_form input {
+    border: 1px solid #cccccc90;
+    box-shadow: 2px 2px 10px 1px transparent;
+}
+
+.add_details_form input:focus {
+    border: 1px solid var(--theme-color);
+    box-shadow: 2px 2px 10px 1px var(--light-theme-color);
+}
+
+.auth-curve {
+    width: 2000px;
+    height: 2000px;
+    background-color: var(--theme-color);
+    border-radius: 50%;
+    transform: translate(-60%, -60%);
+    position: fixed;
+    z-index: 50;
+    transition: all .5s;
+}
+
+/* .auth-curve:hover {
+    animation: animateCurve 1s forwards;
+} */
+.img1 {
+    position: fixed;
+    top: 50%;
+    z-index: 120;
+    left: 20%;
+    width: 25%;
+
+}
+
+.img1 img {
+    width: 100%;
+
+}
+
+.img2 {
+    position: fixed;
+    top: 50%;
+    z-index: 120;
+    right: 0%;
+    left: 50%;
+    display: none;
+}
+
+@keyframes animateCurve {
+    0% {
+
+        border-radius: 50%;
+        transform: translate(-60%, -60%);
+    }
+
+    25%,
+    50% {
+        border-radius: 0%;
+        transform: translate(0%, 0%);
+    }
+
+    100% {
+        border-radius: 50%;
+        transform: translate(30%, -60%);
+    }
+}
+
+.auth-content-cover {
+    position: fixed;
+    z-index: 100;
+    bottom: 50%;
+    /* transform: translateY(0); */
+}
+
+.auth-content-cover-2 {
+    position: fixed;
+    z-index: 100;
+    top: 10%;
+    right: 5%;
+    /* transform: translateY(0); */
+    display: none;
+}
+
+.register-form {
+    justify-content: flex-start;
+}
+
+.register-form-cover {
+    display: none;
+}
+
+@media screen and (max-width:660px) {
+    .taglines {
+        display: none;
+    }
+
+    .login-form,
+    .register-form {
+        padding-top: 8vw;
+    }
+
+    .register-form-cover {
+        transform: translateX(0);
+    }
+
+    .img1,
+    .img2 {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width:900px) {
+
+
+
+    .auth-curve {
+        transform: translate(-28%, 18%);
+    }
+
+    .auth-content-cover {
+        left: 25%;
+        bottom: -5%;
+    }
+
+    .auth-content-cover-2 {
+        top: 0;
+        left: 25%;
+        right: none;
+    }
+
+    .login-form,
+    .register-form {
+        transform: translateX(0) !important;
+    }
+
+    .img1 {
+        left: 0 !important;
+        top: 60%;
+    }
+
+}
+
+.template_profile_img_cover {
+    width: 180px;
+    height: 180px;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+iframe .haAclf {
+    width: 100% !important;
+}
+
+/* transform: translate(-28%, -85%); */
