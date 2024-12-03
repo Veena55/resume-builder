@@ -42,7 +42,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
           port: 22  # SSH port (usually 22)
           script: |
-            cd /var/www/resume-builder
+            cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
             git pull origin master
             cd frontend && npm install && npm run build
             pm2 restart resume-builder-backend  # Restart backend process
