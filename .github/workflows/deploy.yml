@@ -1,12 +1,11 @@
 name: Deploy MERN Stack Project
-
 on:
   push:
     branches:
       - master  # Trigger the workflow on push to the 'master' branch
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
 
     steps:
@@ -14,47 +13,40 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Set up Node.js version to match server (or use a compatible version)
+    # Step 2: Set up Node.js
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '20.18.0'  # Match the server's Node.js version or set another compatible one
+        node-version: '16'  # Specify the Node.js version
 
-    # Step 3: Deploy to Server (SSH into the server)
+    # Step 3: Install dependencies for backend and frontend
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm install
+
+    # Step 4: Build the frontend
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+    # Step 5: Deploy to Server (SSH into the server)
     - name: Deploy to Server
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: ${{ secrets.SERVER_HOST }}  # Your server IP address
-        username: ${{ secrets.SERVER_USER }}  # Your server username
-        key: ${{ secrets.SERVER_SSH_KEY }}  # Your SSH private key
+        host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
+        username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
+        key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
         port: 22  # SSH port (usually 22)
         script: |
-          # Ensure the project directory exists
-          if [ ! -d "/var/www/resume-builder" ]; then
-            git clone https://github.com/Veena55/resume-builder /var/www/resume-builder
-          else
-            cd /var/www/resume-builder
-            git reset --hard
-            git pull origin master
-          fi
-
-          # Install backend dependencies
-          cd /var/www/resume-builder/backend
-          npm install
-
-          # Start the backend with PM2 (or restart if it's already running)
-          pm2 start server.js --name resume-builder-backend || pm2 restart resume-builder-backend
-
-          # Install frontend dependencies
-          cd /var/www/resume-builder/frontend
-          npm install
-
-          # Build the frontend
-          npm run build
-
-          # Move the build files to Apache's directory
-          sudo rm -rf /var/www/html/*
-          sudo cp -r build/* /var/www/html/
-
-          # Restart Apache to serve the updated frontend
-          sudo systemctl restart apache2
+          cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
+          git pull origin master
+          cd frontend && npm install && npm run build
+          pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
+          sudo systemctl restart apache2  # Restart Apache server to serve updated frontend give complete code
