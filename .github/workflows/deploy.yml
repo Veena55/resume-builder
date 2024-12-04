@@ -5,50 +5,48 @@ on:
       - master  # Trigger the workflow on push to the 'master' branch
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
 
     steps:
     # Step 1: Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Deploy to Server (Push Code via SSH)
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Specify the Node.js version
+
+    # Step 3: Install dependencies for backend and frontend
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm install
+
+    # Step 4: Build the frontend
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+    # Step 5: Deploy to Server (SSH into the server)
     - name: Deploy to Server
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: ${{ secrets.SERVER_HOST }}        # Add your server IP address as a GitHub secret
-        username: ${{ secrets.SERVER_USER }}    # Add your server username as a GitHub secret
-        key: ${{ secrets.SERVER_SSH_KEY }}      # Add your SSH private key as a GitHub secret
-        port: 22                                # Default SSH port (change if necessary)
+        host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
+        username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
+        key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
+        port: 22  # SSH port (usually 22)
         script: |
-          # Ensure the project directory exists
-          if [ ! -d "/var/www/resume-builder" ]; then
-            mkdir -p /var/www/resume-builder
-          fi
-          cd /var/www/resume-builder
-
-          # Pull the latest code from GitHub
-          if [ -d ".git" ]; then
-            git reset --hard
-            git pull origin master
-          else
-            git clone https://github.com/Veena55/resume-builder .
-          fi
-
-          # Set up the backend
-          cd backend
-          npm install
-          pm2 start server.js --name resume-builder-backend || pm2 restart resume-builder-backend
-
-          # Set up the frontend
-          cd ../frontend
-          npm install
-          npm run build
-
-          # Move the built frontend files to the Apache root directory
-          sudo rm -rf /var/www/html/*
-          sudo cp -r build/* /var/www/html/
-
-          # Restart Apache to serve the updated frontend
-          sudo systemctl restart apache2
+          cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
+          git pull origin master
+          cd frontend && npm install && npm run build
+          # pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
+          sudo systemctl restart apache2  # Restart Apache server to serve updated frontendresume-builder@0.0.0 build
