@@ -20,11 +20,21 @@ jobs:
         node-version: '16'  # Specify the Node.js version
 
     # Step 3: Install dependencies for backend and frontend
+    - name: Clean backend dependencies
+      run: |
+        cd backend
+        rm -rf node_modules package-lock.json || true
+        
     - name: Install backend dependencies
       run: |
         cd backend
         npm install
-
+        
+    - name: Clean frontend dependencies
+      run: |
+        cd frontend
+        rm -rf node_modules package-lock.json || true
+        
     - name: Install frontend dependencies
       run: |
         cd frontend
