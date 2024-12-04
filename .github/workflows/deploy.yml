@@ -58,5 +58,5 @@ jobs:
           cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
           git pull origin master
           cd frontend && npm install && npm run build
-          pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
+          pm2 start backend/server.js
           sudo systemctl restart apache2  # Restart Apache server to serve updated frontend
