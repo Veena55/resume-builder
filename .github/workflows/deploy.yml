@@ -33,7 +33,7 @@ jobs:
             git reset --hard
             git pull origin master
           else
-            git clone <repository-url> .
+            git clone https://github.com/Veena55/resume-builder .
           fi
 
           # Set up the backend
