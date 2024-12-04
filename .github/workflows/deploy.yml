@@ -6,73 +6,55 @@ on:
       - master  # Trigger the workflow on push to the 'master' branch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+  deploy:
+    runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
 
     steps:
     # Step 1: Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Set up Node.js
+    # Step 2: Set up Node.js version to match server (or use a compatible version)
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'  # Specify the Node.js version
+        node-version: '20.18.0'  # Match the server's Node.js version or set another compatible one
 
-    # Step 3: Install dependencies for backend and frontend
-    - name: Clean backend dependencies
-      run: |
-        cd backend
-        rm -rf node_modules package-lock.json || true
-
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        npm install
-
-    - name: Clean frontend dependencies
-      run: |
-        cd frontend
-        rm -rf node_modules package-lock.json || true
-
-    - name: Install frontend dependencies
-      run: |
-        cd frontend
-        npm install
-
-    # Step 4: Build the frontend
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
-
-    # Step 5: Deploy to Server (SSH into the server)
+    # Step 3: Deploy to Server (SSH into the server)
     - name: Deploy to Server
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: ${{ secrets.SERVER_HOST }}  # Your server IP address (add as a secret in GitHub)
-        username: ${{ secrets.SERVER_USER }}  # Your server username (add as a secret in GitHub)
-        key: ${{ secrets.SERVER_SSH_KEY }}  # Your SSH private key (add as a secret in GitHub)
-        port: 22  # Default SSH port
+        host: ${{ secrets.SERVER_HOST }}  # Your server IP address
+        username: ${{ secrets.SERVER_USER }}  # Your server username
+        key: ${{ secrets.SERVER_SSH_KEY }}  # Your SSH private key
+        port: 22  # SSH port (usually 22)
         script: |
-          # Navigate to project directory
-          cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
-          
-          # Pull the latest changes from the repository
-          git pull origin master
-          
+          # Ensure the project directory exists
+          if [ ! -d "/var/www/resume-builder" ]; then
+            git clone https://github.com/Veena55/resume-builder /var/www/resume-builder
+          else
+            cd /var/www/resume-builder
+            git reset --hard
+            git pull origin master
+          fi
+
           # Install backend dependencies
-          cd backend
+          cd /var/www/resume-builder/backend
           npm install
-          
-          # Restart backend service using PM2
-          pm2 restart resume-builder-backend || pm2 start backend/server.js --name resume-builder-backend
-          
-          # Navigate to frontend, install dependencies, and build
-          cd ../frontend
+
+          # Start the backend with PM2 (or restart if it's already running)
+          pm2 start server.js --name resume-builder-backend || pm2 restart resume-builder-backend
+
+          # Install frontend dependencies
+          cd /var/www/resume-builder/frontend
           npm install
+
+          # Build the frontend
           npm run build
-          
-          # Ensure Apache or Nginx serves the updated frontend
-          sudo systemctl restart apache2 || sudo systemctl restart nginx
+
+          # Move the build files to Apache's directory
+          sudo rm -rf /var/www/html/*
+          sudo cp -r build/* /var/www/html/
+
+          # Restart Apache to serve the updated frontend
+          sudo systemctl restart apache2
