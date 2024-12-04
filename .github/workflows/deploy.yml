@@ -1,4 +1,5 @@
 name: Deploy MERN Stack Project
+
 on:
   push:
     branches:
@@ -6,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     steps:
     # Step 1: Checkout the repository
@@ -20,10 +21,20 @@ jobs:
         node-version: '16'  # Specify the Node.js version
 
     # Step 3: Install dependencies for backend and frontend
+    - name: Clean backend dependencies
+      run: |
+        cd backend
+        rm -rf node_modules package-lock.json || true
+
     - name: Install backend dependencies
       run: |
         cd backend
         npm install
+
+    - name: Clean frontend dependencies
+      run: |
+        cd frontend
+        rm -rf node_modules package-lock.json || true
 
     - name: Install frontend dependencies
       run: |
@@ -40,13 +51,28 @@ jobs:
     - name: Deploy to Server
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
-        username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
-        key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
-        port: 22  # SSH port (usually 22)
+        host: ${{ secrets.SERVER_HOST }}  # Your server IP address (add as a secret in GitHub)
+        username: ${{ secrets.SERVER_USER }}  # Your server username (add as a secret in GitHub)
+        key: ${{ secrets.SERVER_SSH_KEY }}  # Your SSH private key (add as a secret in GitHub)
+        port: 22  # Default SSH port
         script: |
+          # Navigate to project directory
           cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
+          
+          # Pull the latest changes from the repository
           git pull origin master
-          cd frontend && npm install && npm run build
-          # pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
-          sudo systemctl restart apache2  # Restart Apache server to serve updated frontendresume-builder@0.0.0 build
+          
+          # Install backend dependencies
+          cd backend
+          npm install
+          
+          # Restart backend service using PM2
+          pm2 restart resume-builder-backend || pm2 start backend/server.js --name resume-builder-backend
+          
+          # Navigate to frontend, install dependencies, and build
+          cd ../frontend
+          npm install
+          npm run build
+          
+          # Ensure Apache or Nginx serves the updated frontend
+          sudo systemctl restart apache2 || sudo systemctl restart nginx
