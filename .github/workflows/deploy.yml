@@ -47,6 +47,13 @@ jobs:
       run: |
         cd frontend
         npm run build
+        ll
+        
+ # Step 7: Sending Build Folder
+    - name: Sending Build Folder to server
+      run: |
+          cd frontend/dist
+          scp -i private_key -o StrictHostKeyChecking=no -r ./* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_CLIENT_PATH }}
 
     # # Step 5: Deploy to Server (SSH into the server)
     # - name: Deploy to Server
