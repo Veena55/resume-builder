@@ -20,7 +20,8 @@ jobs:
       with:
         node-version: '20'  # Specify the Node.js version
         
-    - name: Set up Presequities
+     # Step 3: Set up prerequisite   
+    - name: Set up Prerequisite (SSH Key Scan)
       run: |
           echo "${{ secrets.SERVER_SSH_KEY }}" > private_key
           chmod 600 private_key
@@ -29,26 +30,23 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
           
+     # Step 4: Sending Backend Files
     - name: Sending Backend Files to server
       run: |
           scp -i private_key -o StrictHostKeyChecking=no -r ./backend/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}
 
-    # # Step 3: Install dependencies for backend and frontend
-    # # - name: Install backend dependencies
-    # #   run: |
-    # #     cd backend
-    # #     npm install
+    # Step 5: Install dependencies frontend 
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm install
 
-    # - name: Install frontend dependencies
-    #   run: |
-    #     cd frontend
-    #     npm install
-
-    # # Step 4: Build the frontend
-    # - name: Build frontend
-    #   run: |
-    #     cd frontend
-    #     npm run build
+    # Step 6: Build the frontend
+    - name: Build frontend
+      run: |
+        pwd
+        cd frontend
+        npm run build
 
     # # Step 5: Deploy to Server (SSH into the server)
     # - name: Deploy to Server
