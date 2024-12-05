@@ -5,8 +5,9 @@ on:
       - master  # Trigger the workflow on push to the 'master' branch
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest  # Runs the job on an Ubuntu runner
+    environment: production
 
     steps:
     # Step 1: Checkout the repository
@@ -17,36 +18,49 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'  # Specify the Node.js version
-
-    # Step 3: Install dependencies for backend and frontend
-    - name: Install backend dependencies
+        node-version: '20'  # Specify the Node.js version
+        
+    - name: Set up Presequities
       run: |
-        cd backend
-        npm install
+          echo "${{ secrets.SERVER_SSH_KEY }}" > private_key
+          chmod 600 private_key
 
-    - name: Install frontend dependencies
+          # Add the host key to known_hosts
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          
+    - name: Sending Backend Files to server
       run: |
-        cd frontend
-        npm install
+          scp -i private_key -o StrictHostKeyChecking=no -r ./backend/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_PATH }}
 
-    # Step 4: Build the frontend
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
+    # # Step 3: Install dependencies for backend and frontend
+    # # - name: Install backend dependencies
+    # #   run: |
+    # #     cd backend
+    # #     npm install
 
-    # Step 5: Deploy to Server (SSH into the server)
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
-        username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
-        key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
-        port: 22  # SSH port (usually 22)
-        script: |
-          cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
-          git pull origin master
-          cd frontend && npm install && npm run build
-          pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
-          sudo systemctl restart apache2  # Restart Apache server to serve updated frontend give complete code
+    # - name: Install frontend dependencies
+    #   run: |
+    #     cd frontend
+    #     npm install
+
+    # # Step 4: Build the frontend
+    # - name: Build frontend
+    #   run: |
+    #     cd frontend
+    #     npm run build
+
+    # # Step 5: Deploy to Server (SSH into the server)
+    # - name: Deploy to Server
+    #   uses: appleboy/ssh-action@v0.1.6
+    #   with:
+    #     host: ${{ secrets.SERVER_HOST }}  # Add your server IP address as a secret in GitHub
+    #     username: ${{ secrets.SERVER_USER }}  # Add your server username as a secret in GitHub
+    #     key: ${{ secrets.SERVER_SSH_KEY }}  # Add your SSH private key as a secret in GitHub
+    #     port: 22  # SSH port (usually 22)
+    #     script: |
+    #       cd /var/www/${{ secrets.SERVER_PROJECT_PATH }}
+    #       git pull origin master
+    #       cd frontend && npm install && npm run build
+    #       pm2 restart resume-builder-backend  # Restart backend process (make sure pm2 is set up)
+    #       sudo systemctl restart apache2  # Restart Apache server to serve updated frontend give complete code
