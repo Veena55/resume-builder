@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 src/utilities/Variables.jsx
+
+# removing platform dependencies by eliminating package-lock.json
+package-lock.json
