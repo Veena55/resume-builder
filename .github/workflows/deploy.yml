@@ -47,7 +47,7 @@ jobs:
       run: |
         cd frontend
         npm run build
-        ll
+        ls -l
         
  # Step 7: Sending Build Folder
     - name: Sending Build Folder to server
