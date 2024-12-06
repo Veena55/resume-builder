@@ -54,6 +54,13 @@ jobs:
       run: |
           scp -i private_key -o StrictHostKeyChecking=no -r ./frontend/dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PROJECT_CLIENT_PATH }}
 
+# Step 8: Installing Backend Dependenices
+    - name: Installing Backend Dependenices
+      run: |
+          ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<< EOF
+          cd ${{ secrets.SERVER_PROJECT_PATH }}
+          npm install
+          EOF
     # # Step 5: Deploy to Server (SSH into the server)
     # - name: Deploy to Server
     #   uses: appleboy/ssh-action@v0.1.6
