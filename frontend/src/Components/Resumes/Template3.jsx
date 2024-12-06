@@ -9,10 +9,13 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import Variable from "../../utilities/Variables";
 
 const Template3 = ({ tempId }) => {
     const printRef = useRef();
     const [resume, setResume] = useState({});
+    const { API_URL } = Variable();
+
     let token = localStorage.getItem('token');
     let temp_id = '';
 
@@ -39,7 +42,7 @@ const Template3 = ({ tempId }) => {
     };
 
     const handlePrint = async () => {
-        const imageUrl = `http://localhost:8080/uploads/${resume.image}`;
+        const imageUrl = `${API_URL}/uploads/${resume.image}`;
         let base64Image = '';
 
         try {
@@ -98,7 +101,7 @@ const Template3 = ({ tempId }) => {
     const getData = async () => {
         const templateId = tempId || temp_id;
         try {
-            const template = await axios.get(`http://localhost:8080/resume/resume_details/${templateId}`, {
+            const template = await axios.get(`${API_URL}/resume/resume_details/${templateId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -121,7 +124,7 @@ const Template3 = ({ tempId }) => {
                     <div className="row mx-0 justify-content-between align-items-center">
                         <div className="col-3">
                             {resume.image && <div className="rounded-circle template_profile_img_cover bg-light shadow">
-                                <img src={`http://localhost:8080/uploads/${resume.image}`} className="object-contain rounded-circle" width="150" height="150" alt="my_profile" />
+                                <img src={`${API_URL}/uploads/${resume.image}`} className="object-contain rounded-circle" width="150" height="150" alt="my_profile" />
                             </div>}
                         </div>
                         <div className="col-9">

@@ -4,10 +4,13 @@ import jsPDF from "jspdf";
 import { useEffect, useRef, useState } from "react";
 import { FaDotCircle, FaGithub, FaLinkedin } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import Variable from "../../utilities/Variables";
 
 const Template1 = ({ tempId }) => {
     const [resume, setResume] = useState({});
     const printRef = useRef();
+    const { API_URL } = Variable();
+
     let temp_id = '';
     if (tempId) {
         temp_id = tempId;
@@ -36,7 +39,7 @@ const Template1 = ({ tempId }) => {
     }
     const getData = async () => {
         try {
-            const template = await axios.get(`http://localhost:6000/resume/resume_details/${temp_id}`, {
+            const template = await axios.get(`${API_URL}/resume/resume_details/${temp_id}`, {
                 headers: {
                     'authorization': `Bearer ${token}`
                 }

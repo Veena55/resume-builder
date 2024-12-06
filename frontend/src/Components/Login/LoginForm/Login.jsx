@@ -13,8 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const LoginForm = () => {
     const [user, setUser] = useState({ email: "", password: "" });
     const navigate = useNavigate();
-    const { GOOGLE_CLIENT_ID } = Variable();
-
+    const { GOOGLE_CLIENT_ID, API_URL } = Variable();
     const notify = (msg) => {
         return toast(msg);
     }
@@ -22,7 +21,7 @@ const LoginForm = () => {
     const handleSuccess = async (response) => {
         const { credential } = response;
         try {
-            const res = await axios.post('http://localhost:8080/auth/verify_token', { token: credential });
+            const res = await axios.post(`${API_URL}/auth/verify_token`, { token: credential });
             localStorage.setItem('token', res.data.token);
             if (res.data.token) {
                 notify("Login Successfully!!");
@@ -50,7 +49,7 @@ const LoginForm = () => {
                 toast.error("Please fill all the details!!");
                 return;
             }
-            const response = await axios.post("http://localhost:8080/auth/login", { data: user });
+            const response = await axios.post(`${API_URL}/auth/login`, { data: user });
             if (response) {
                 console.log(response);
                 localStorage.setItem('token', response.data.token);
@@ -92,7 +91,7 @@ const LoginForm = () => {
                 <div className='form-group mt-3 text-center'>
                     <div className='mt-2'></div>
                     <div className="justify-content-center py-1 d-flex align-items-center">
-                        <button to='http://localhost:8080/auth/google' className='btn cta-btn rounded-circle p-2'>
+                        <button to={`${API_URL}/auth/google`} className='btn cta-btn rounded-circle p-2'>
                             <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} nonce=''>
                                 <GoogleLogin
                                     onSuccess={handleSuccess}

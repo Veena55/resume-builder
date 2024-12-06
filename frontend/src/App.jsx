@@ -12,6 +12,7 @@ import Main from './Components/Main/Main';
 // import { GoogleOAuthProvider } from '@react-oauth/google';
 import useVerifyJWT from './utilities/useVerifyJWT';
 import MyResume from './Components/Resumes/MyResume';
+import Variable from './utilities/Variables';
 
 const ProctectedRoute = ({ element }) => {
   const navigate = useNavigate();

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Variable from './Variables';
 
 const useVerifyJWT = () => {
     const navigate = useNavigate();
     const [isAuthenticated, setAuthenticated] = useState(null);
+    const { API_URL } = Variable();
 
     useEffect(() => {
         const verifyToken = async () => {
@@ -18,7 +20,7 @@ const useVerifyJWT = () => {
             }
 
             try {
-                const response = await axios.get('http://localhost:8080/auth/protected-route', {
+                const response = await axios.get(`${API_URL}/auth/protected-route`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

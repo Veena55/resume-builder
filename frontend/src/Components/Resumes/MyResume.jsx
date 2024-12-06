@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import Template2 from "./Template2";
 import Template3 from "./Template3";
 import { toast } from "react-toastify";
+import Variable from "../../utilities/Variables";
 
 const MyResume = () => {
     const token = localStorage.getItem('token');
@@ -13,9 +14,10 @@ const MyResume = () => {
     const [showTemplate, setShowTemplate] = useState(false);
     const [templateNo, setTemplateNo] = useState(0);
     const [templateId, setTemplateId] = useState(0);
+    const { API_URL } = Variable();
 
     const getResume = async () => {
-        const myResumes = await axios.get(`http://localhost:8080/resume/my_resume`, {
+        const myResumes = await axios.get(`${API_URL}/resume/my_resume`, {
             headers: {
                 'authorization': `Bearer ${token}`
             }
@@ -35,7 +37,7 @@ const MyResume = () => {
     }
 
     const deleteResume = async (templateId) => {
-        const result = await axios.post(`http://localhost:8080/resume/delete`, { tempId: templateId }, {
+        const result = await axios.post(`${API_URL}/resume/delete`, { tempId: templateId }, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (result) {

@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 const RegisterForm = () => {
     const [user, setUser] = useState();
     const navigate = useNavigate();
-    const { GOOGLE_CLIENT_ID } = Variable();
+    const { GOOGLE_CLIENT_ID, API_URL } = Variable();
     const [formData, setFormData] = useState({ username: '', email: '', password: '', cpassword: '' });
 
     const handleChange = (e) => {
@@ -24,7 +24,7 @@ const RegisterForm = () => {
     const handleSuccess = async (response) => {
         const { credential } = response;
         try {
-            const res = await axios.post('http://localhost:8080/auth/verify_token', { token: credential });
+            const res = await axios.post(`${API_URL}/auth/verify_token`, { token: credential });
             // setUser(res.data.user);
             localStorage.setItem('token', res.data.token);
             if (res.data.token) {
@@ -42,7 +42,7 @@ const RegisterForm = () => {
         e.preventDefault();
         try {
             if (formData.username != '' && formData.email != '' && formData.password != '' && formData.cpassword != '') {
-                const res = await axios.post('http://localhost:8080/auth/signup', formData);
+                const res = await axios.post(`${API_URL}/auth/signup`, formData);
                 console.log(res);
                 toast.success(res.data.message + "Please Login now!");
             } else {
@@ -90,7 +90,7 @@ const RegisterForm = () => {
                     <p className='text-center fw-medium'>OR</p>
                 </div>
                 <div className="justify-content-center py-1 d-flex align-items-center">
-                    <button to='http://localhost:8080/auth/google' className='btn cta-btn rounded-circle p-2'>
+                    <button to={`${API_URL}/auth/google`} className='btn cta-btn rounded-circle p-2'>
                         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} nonce=''>
                             <GoogleLogin
                                 onSuccess={handleSuccess}

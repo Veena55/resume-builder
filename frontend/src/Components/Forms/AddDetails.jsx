@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Variable from "../../utilities/Variables";
 
 const AddDetails = () => {
     const [projects, setProjects] = useState([{ p_name: '', p_descp: '', showDeleteIcon: false }]);
@@ -27,6 +28,7 @@ const AddDetails = () => {
     const [filename, setFilename] = useState('Choose File');
     const { template } = useParams();
     const navigate = useNavigate();
+    const API_URL = Variable().API_URL;
 
     //JWT Token
     const token = localStorage.getItem('token');
@@ -203,7 +205,7 @@ const AddDetails = () => {
         try {
             if (isSubmit) {
                 const sendFormData = async () => {
-                    const res = await axios.post('http://localhost:8080/resume/create', { data: formData }, {
+                    const res = await axios.post(`${API_URL}/resume/create`, { data: formData }, {
                         headers: {
                             'authorization': `Bearer ${token}`
                         }
@@ -214,7 +216,7 @@ const AddDetails = () => {
                         const formDataToSend = new FormData();
                         formDataToSend.append('image', file);
                         formDataToSend.append('resumeId', resumeId);
-                        let result = await axios.post('http://localhost:8080/upload/file', formDataToSend, {
+                        let result = await axios.post(`${API_URL}/upload/file`, formDataToSend, {
                             headers: {
                                 'Authorization': `Bearer ${token}`,
                                 'Content-Type': 'multipart/form-data'
